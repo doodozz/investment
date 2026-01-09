@@ -1,82 +1,74 @@
-{\rtf1\ansi\ansicpg950\cocoartf2761
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+/* 全域 reset */
+* { margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; }
 
-\f0\fs24 \cf0 /* \uc0\u20840 \u22495  reset */\
-* \{ margin:0; padding:0; box-sizing:border-box; font-family:sans-serif; \}\
-\
-body \{ background:#f5f5f5; color:#333; \}\
-\
-.app \{ max-width:480px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; \}\
-\
-.page \{ display:none; flex:1; padding:10px; overflow-y:auto; \}\
-.page.active \{ display:block; \}\
-\
-h2 \{ text-align:center; margin-bottom:10px; \}\
-\
-/* \uc0\u24213 \u37096  Tab */\
-.tab-bar \{\
-    display:flex;\
-    justify-content:space-around;\
-    background:#fff;\
-    padding:5px 0;\
-    box-shadow:0 -2px 5px rgba(0,0,0,0.1);\
-    position: sticky;\
-    bottom:0;\
-\}\
-.tab-bar button \{\
-    flex:1;\
-    border:none;\
-    background:none;\
-    padding:10px 0;\
-    font-weight:bold;\
-    font-size:16px;\
-\}\
-.tab-bar button:active \{\
-    color:#007bff;\
-\}\
-\
-/* \uc0\u36039 \u29986 \u21345 \u29255  */\
-.asset-card \{\
-    background:#fff;\
-    margin:5px 0;\
-    padding:10px;\
-    border-radius:10px;\
-    box-shadow:0 2px 5px rgba(0,0,0,0.1);\
-\}\
-\
-/* \uc0\u20489 \u20301 \u34920 \u26684  */\
-.position-table \{\
-    width:100%;\
-    border-collapse:collapse;\
-    margin-top:10px;\
-\}\
-.position-table th, .position-table td \{\
-    border:1px solid #ddd;\
-    padding:5px;\
-    text-align:center;\
-\}\
-.position-table th \{\
-    background:#f0f0f0;\
-\}\
-\
-/* \uc0\u36664 \u20837 \u27396 \u20301  */\
-input[type="number"], input[type="text"] \{\
-    width:80px;\
-    padding:3px 5px;\
-    margin:2px;\
-\}\
-\
-/* \uc0\u25353 \u37397  */\
-button.action-btn \{\
-    padding:5px 10px;\
-    margin:2px;\
-    border:none;\
-    background:#007bff;\
-    color:#fff;\
-    border-radius:5px;\
-\}\
+body { background:#f5f5f5; color:#333; }
+
+.app { max-width:480px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; }
+
+.page { display:none; flex:1; padding:10px; overflow-y:auto; }
+.page.active { display:block; }
+
+h2 { text-align:center; margin-bottom:10px; }
+
+/* 底部 Tab */
+.tab-bar {
+    display:flex;
+    justify-content:space-around;
+    background:#fff;
+    padding:5px 0;
+    box-shadow:0 -2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    bottom:0;
+}
+.tab-bar button {
+    flex:1;
+    border:none;
+    background:none;
+    padding:10px 0;
+    font-weight:bold;
+    font-size:16px;
+}
+.tab-bar button:active {
+    color:#007bff;
+}
+
+/* 資產卡片 */
+.asset-card {
+    background:#fff;
+    margin:5px 0;
+    padding:10px;
+    border-radius:10px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 倉位表格 */
+.position-table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+.position-table th, .position-table td {
+    border:1px solid #ddd;
+    padding:5px;
+    text-align:center;
+}
+.position-table th {
+    background:#f0f0f0;
+}
+
+/* 輸入欄位 */
+input[type="number"], input[type="text"] {
+    width:80px;
+    padding:3px 5px;
+    margin:2px;
+}
+
+/* 按鈕 */
+button.action-btn {
+    padding:5px 10px;
+    margin:2px;
+    border:none;
+    background:#007bff;
+    color:#fff;
+    border-radius:5px;
 }
