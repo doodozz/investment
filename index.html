@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投資小 App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 頁面內容 -->
+        <div id="page-assets" class="page active">
+            <h2>資產總覽</h2>
+            <div id="asset-summary"></div>
+        </div>
+
+        <div id="page-positions" class="page">
+            <h2>倉位檢視</h2>
+            <div id="position-tabs">
+                <button onclick="switchMarket('US')">美股</button>
+                <button onclick="switchMarket('TW')">台股</button>
+            </div>
+            <div id="positions-container"></div>
+        </div>
+
+        <div id="page-profit" class="page">
+            <h2>停利計算</h2>
+            <div id="profit-container"></div>
+        </div>
+
+        <div id="page-cash" class="page">
+            <h2>預備金</h2>
+            <div id="cash-container"></div>
+        </div>
+
+        <!-- 底部 Tab 切換 -->
+        <div class="tab-bar">
+            <button onclick="showPage('page-assets')">資產</button>
+            <button onclick="showPage('page-positions')">倉位</button>
+            <button onclick="showPage('page-profit')">停利</button>
+            <button onclick="showPage('page-cash')">預備金</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
