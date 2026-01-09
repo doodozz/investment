@@ -1,0 +1,200 @@
+{\rtf1\ansi\ansicpg950\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 /* ==== \uc0\u20489 \u20301 \u36039 \u26009 \u23531 \u27515  ==== */\
+let positions = [\
+    \{market:"US", type:"stock", symbol:"ONDS", name:"Ondas Holdings", shares:120, avgPrice:5.2, currentPrice:7.3\},\
+    \{market:"US", type:"dca", symbol:"VOO", name:"VOO ETF", shares:50, avgPrice:400, currentPrice:410\},\
+    \{market:"TW", type:"stock", symbol:"2330", name:"\uc0\u21488 \u31309 \u38651 ", shares:30, avgPrice:550, currentPrice:580\},\
+    \{market:"TW", type:"dca", symbol:"0050", name:"\uc0\u21488 \u28771 50", shares:20, avgPrice:130, currentPrice:135\}\
+];\
+\
+/* ==== LocalStorage \uc0\u35373 \u23450  ==== */\
+let storageKey = "investmentAppData";\
+let appData = JSON.parse(localStorage.getItem(storageKey)) || \{\
+    prices: \{\},           // \uc0\u29694 \u20729 \u25163 \u21205 \u36664 \u20837 \
+    cash: \{ basic:0, extra:0, future:[] \},\
+    lastRateDate: null,\
+    USD_TWD: null\
+\};\
+\
+/* ==== \uc0\u21295 \u29575 \u25235 \u21462  (\u30070 \u22825 \u27794 \u25235 \u36942 \u25165 \u25235 ) ==== */\
+async function fetchRate() \{\
+    const today = new Date().toISOString().slice(0,10);\
+    if(appData.lastRateDate === today && appData.USD_TWD) return appData.USD_TWD;\
+\
+    try \{\
+        const resp = await fetch("https://api.exchangerate-api.com/v4/latest/USD");\
+        const data = await resp.json();\
+        const rate = data.rates?.TWD;\
+        if(rate)\{\
+            appData.USD_TWD = rate;\
+            appData.lastRateDate = today;\
+            localStorage.setItem(storageKey, JSON.stringify(appData));\
+            return rate;\
+        \}\
+    \} catch(e)\{\
+        console.error("\uc0\u21295 \u29575 \u25235 \u21462 \u22833 \u25943 ", e);\
+        return 32; // fallback\
+    \}\
+\}\
+\
+/* ==== \uc0\u38913 \u38754 \u20999 \u25563  ==== */\
+function showPage(id)\{\
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));\
+    document.getElementById(id).classList.add("active");\
+    if(id==="page-assets") renderAssets();\
+    if(id==="page-positions") renderPositions();\
+    if(id==="page-profit") renderProfit();\
+    if(id==="page-cash") renderCash();\
+\}\
+\
+/* ==== \uc0\u36039 \u29986 \u38913  ==== */\
+async function renderAssets()\{\
+    const container = document.getElementById("asset-summary");\
+    container.innerHTML = "\uc0\u36617 \u20837 \u20013 ...";\
+\
+    const rate = await fetchRate();\
+\
+    let usTotal = 0, twTotal=0;\
+    positions.forEach(p=>\{\
+        const price = appData.prices[p.symbol] || p.currentPrice;\
+        const value = price * p.shares;\
+        if(p.market==="US") usTotal += value;\
+        else twTotal += value;\
+    \});\
+\
+    container.innerHTML = `\
+        <div class="asset-card">\uc0\u32654 \u32929 \u32317 \u36039 \u29986 : $$\{usTotal.toLocaleString()\} USD<br>\
+        \uc0\u25563 \u31639  TWD: NT$$\{(usTotal*rate).toLocaleString()\}</div>\
+        <div class="asset-card">\uc0\u21488 \u32929 \u32317 \u36039 \u29986 : NT$$\{twTotal.toLocaleString()\}</div>\
+        <div class="asset-card">\uc0\u32317 \u36039 \u29986  (\u21547 \u32654 \u32929 \u25563 \u31639  TWD): NT$$\{(twTotal + usTotal*rate).toLocaleString()\} <br>\
+        \uc0\u21295 \u29575 : $\{rate\} <small>(\u26368 \u24460 \u26356 \u26032 : $\{appData.lastRateDate\})</small></div>\
+    `;\
+\}\
+\
+/* ==== \uc0\u20489 \u20301 \u38913  ==== */\
+let currentMarket = "US";\
+function switchMarket(market)\{\
+    currentMarket = market;\
+    renderPositions();\
+\}\
+\
+function renderPositions()\{\
+    const container = document.getElementById("positions-container");\
+    const filtered = positions.filter(p=>p.market===currentMarket);\
+    let html = `<table class="position-table"><tr><th>\uc0\u20195 \u30908 </th><th>\u21517 \u31281 </th><th>\u32929 \u25976 </th><th>\u22343 \u20729 </th><th>\u29694 \u20729 </th><th>\u24066 \u20540 </th><th>\u25805 \u20316 </th></tr>`;\
+    filtered.forEach(p=>\{\
+        const price = appData.prices[p.symbol] || p.currentPrice;\
+        const value = (price * p.shares).toFixed(2);\
+        html += `<tr>\
+            <td>$\{p.symbol\}</td>\
+            <td>$\{p.name\}</td>\
+            <td>$\{p.shares\}</td>\
+            <td>$\{p.avgPrice\}</td>\
+            <td><input type="number" value="$\{price\}" onchange="updatePrice('$\{p.symbol\}',this.value)"></td>\
+            <td>$\{value\}</td>\
+            <td><button class="action-btn" onclick="selectStock('$\{p.symbol\}')">\uc0\u20572 \u21033 \u35336 \u31639 </button></td>\
+        </tr>`;\
+    \});\
+    html += `</table>`;\
+    container.innerHTML = html;\
+\}\
+\
+function updatePrice(symbol, value)\{\
+    appData.prices[symbol] = parseFloat(value);\
+    localStorage.setItem(storageKey, JSON.stringify(appData));\
+    renderPositions();\
+\}\
+\
+/* ==== \uc0\u20572 \u21033 \u38913  ==== */\
+let selectedStock = null;\
+function selectStock(symbol)\{\
+    selectedStock = positions.find(p=>p.symbol===symbol);\
+    showPage("page-profit");\
+\}\
+\
+function renderProfit()\{\
+    const container = document.getElementById("profit-container");\
+    if(!selectedStock)\{\
+        container.innerHTML = "\uc0\u35531 \u20808 \u24478 \u20489 \u20301 \u38913 \u36984 \u25799 \u32929 \u31080 ";\
+        return;\
+    \}\
+    const price = appData.prices[selectedStock.symbol] || selectedStock.currentPrice;\
+    const halfShares = selectedStock.shares / 2;\
+    const realized = (price - selectedStock.avgPrice) * halfShares;\
+    const remainingCost = selectedStock.avgPrice * selectedStock.shares - realized;\
+    const maxDrop = realized / 2;\
+    const stopPrice = price - maxDrop/halfShares;\
+\
+    container.innerHTML = `\
+        <h3>$\{selectedStock.name\} ($\{selectedStock.symbol\})</h3>\
+        <p>\uc0\u32929 \u25976 : $\{selectedStock.shares\}, \u22343 \u20729 : $\{selectedStock.avgPrice\}, \u29694 \u20729 : $\{price\}</p>\
+        <p>\uc0\u20986 \u19968 \u21322 \u32929 \u25976 : $\{halfShares\} \u32929 </p>\
+        <p>\uc0\u24050 \u23526 \u29694 \u29554 \u21033 : $\{realized.toFixed(2)\}</p>\
+        <p>\uc0\u21097 \u39192 \u25104 \u26412 : $\{remainingCost.toFixed(2)\}</p>\
+        <p>\uc0\u20572 \u21033 \u20729  (\u22238 \u21520 \u19981 \u36229 \u36942 \u19968 \u21322 ): $\{stopPrice.toFixed(2)\}</p>\
+        <label>\uc0\u21443 \u32771 \u22343 \u32218  X \u26085 : <input type="number" value="20"></label>\
+    `;\
+\}\
+\
+/* ==== \uc0\u38928 \u20633 \u37329 \u38913  ==== */\
+function renderCash()\{\
+    const container = document.getElementById("cash-container");\
+    let basic = appData.cash.basic || 0;\
+    let extra = appData.cash.extra || 0;\
+    let future = appData.cash.future || [];\
+\
+    let futureHtml = future.map((f,i)=>`<li>$\{f.name\}: NT$$\{f.amount\}<button onclick="removeFuture($\{i\})">\uc0\u21034 \u38500 </button></li>`).join("");\
+\
+    container.innerHTML = `\
+        <h4>\uc0\u29983 \u23384 \u29694 \u37329 </h4>\
+        \uc0\u27599 \u26376 \u22522 \u26412 \u38283 \u37559 : <input type="number" value="$\{basic\}" onchange="updateCash('basic',this.value)"> \
+        <p>6\uc0\u20491 \u26376 : NT$$\{(basic*6)\} / 9\u20491 \u26376 : NT$$\{(basic*9)\}</p>\
+        <h4>\uc0\u21152 \u30908 \u29694 \u37329  (10~15% \u32929 \u31080 \u32317 \u38989 )</h4>\
+        <p>10%: NT$$\{getStockTotal()*0.1\} / 15%: NT$$\{getStockTotal()*0.15\}</p>\
+        <h4>\uc0\u26410 \u20358 \u38928 \u35336 \u33457 \u36027 </h4>\
+        \uc0\u21517 \u31281 : <input type="text" id="futureName"> \u37329 \u38989 : <input type="number" id="futureAmount">\
+        <button onclick="addFuture()">\uc0\u26032 \u22686 </button>\
+        <ul>$\{futureHtml\}</ul>\
+        <h4>\uc0\u38928 \u20633 \u37329 \u32317 \u38989 : NT$$\{basic + extra + future.reduce((a,f)=>a+f.amount,0)\}</h4>\
+    `;\
+\}\
+\
+function getStockTotal()\{\
+    let total = 0;\
+    positions.forEach(p=>\{\
+        const price = appData.prices[p.symbol] || p.currentPrice;\
+        total += price * p.shares;\
+    \});\
+    return total;\
+\}\
+\
+function updateCash(type, value)\{\
+    appData.cash[type] = parseFloat(value);\
+    localStorage.setItem(storageKey, JSON.stringify(appData));\
+    renderCash();\
+\}\
+\
+function addFuture()\{\
+    const name = document.getElementById("futureName").value;\
+    const amount = parseFloat(document.getElementById("futureAmount").value);\
+    if(!name || isNaN(amount)) return;\
+    appData.cash.future.push(\{name, amount\});\
+    localStorage.setItem(storageKey, JSON.stringify(appData));\
+    renderCash();\
+\}\
+\
+function removeFuture(i)\{\
+    appData.cash.future.splice(i,1);\
+    localStorage.setItem(storageKey, JSON.stringify(appData));\
+    renderCash();\
+\}\
+\
+/* ==== \uc0\u21021 \u22987 \u21270  ==== */\
+showPage("page-assets");\
+}
